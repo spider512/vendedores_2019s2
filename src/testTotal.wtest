@@ -1,0 +1,57 @@
+import centrosDeDistribucion.*
+import vendedores.*
+import ciudades.*
+import clientes.*
+
+test "testVendedores" {
+	
+const buenosAires = new Provincia()	
+buenosAires.poblacion(15000000)
+
+const cordoba = new Provincia()	
+buenosAires.poblacion(6000000)
+
+const santaFe = new Provincia()	
+santaFe.poblacion( 5000000 )
+
+const rosario = new Ciudad()
+rosario.provincia(santaFe)
+
+const nono =  new Ciudad()
+nono.provincia(cordoba)
+
+const marDelPlata =  new Ciudad()
+marDelPlata.provincia(buenosAires)
+
+const sanPedro =  new Ciudad()
+sanPedro.provincia(buenosAires)
+
+const hurlingham =  new Ciudad()
+hurlingham.provincia(buenosAires)
+
+cordoba.agregarCiudad(nono)
+
+buenosAires.agregarCiudad(hurlingham)
+buenosAires.agregarCiudad(sanPedro)
+buenosAires.agregarCiudad(marDelPlata)
+
+
+const vViajante1 = new VViajante()
+
+vViajante1.agregarProvincia(cordoba)
+vViajante1.agregarProvincia(buenosAires)
+
+const vFijo1 = new Vfijo()
+
+vFijo1.ciudad(hurlingham)
+
+	assert.equals(hurlingham, vFijo1.ciudad())
+
+assert.that(vFijo1.puedeTrabajarEnCiudad(hurlingham) )
+assert.that( not vFijo1.puedeTrabajarEnCiudad(nono) )
+
+assert.that(vViajante1.puedeTrabajarEnCiudad(hurlingham) )
+assert.that(vViajante1.puedeTrabajarEnCiudad(nono) )
+assert.that(not vViajante1.puedeTrabajarEnCiudad(rosario) )
+
+}
