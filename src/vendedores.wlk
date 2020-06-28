@@ -7,6 +7,10 @@ class Vendedor {
 	var property certificaciones = []
 	var property personaFisica = true
 	
+	method puntajeTotal() {
+		return certificaciones.map({cadaCert => cadaCert.puntos() }).sum()
+	}
+
 	method agregarCertificacion(unaCertificacion) { certificaciones.add(unaCertificacion) 
 		
 	}
@@ -26,10 +30,9 @@ class Vendedor {
 	method certificacionesSobreProductos() { return certificaciones.filter( { cert => cert.esSobreProductos() }).size()
 		
 	}
-	
 
 	method multiCertificado() { return certificaciones.any( {cert => cert.esSobreProductos()} )
-		and not certificaciones.any( {cert => cert.esSobreProductos()} )
+		and  certificaciones.any( {cert => not cert.esSobreProductos()} )
 	}
 	
 	
@@ -68,7 +71,7 @@ class VViajante inherits Vendedor {
 	}
 	
 	method esInfluyente() { 
-		return provinciasHabilitadas.map( {prov => prov.poblacion()} ).sum() >= 10000000
+		return  provinciasHabilitadas.map( {prov => prov.poblacion()} ).sum() <= 10000000 
 	}
 	
 	method tieneAfinidad(unCentro) { return self.puedeTrabajarEnCiudad( unCentro.ciudad() ) 
@@ -80,22 +83,26 @@ class VViajante inherits Vendedor {
 
 class VComercioCorresponsal inherits Vendedor {
 	
-	var property ciudadesConSucursales = {}
+	var property ciudadesConSucursales = []
 	
 	method puedeTrabajarEnCiudad(unaCiudad) { 
 		return ciudadesConSucursales.contains(unaCiudad)
 	}
 	
+	method agregarCiudad(unaCiudad) {
+		ciudadesConSucursales.add(unaCiudad)
+	}
+	
 	method esInfluyente() { 
 		return ciudadesConSucursales.size() >= 5 or
-		 ciudadesConSucursales.map( { ciud => ciud.provincia() } ).size() >= 3
+		 ciudadesConSucursales.map( { ciud => ciud.provincia() } ).asSet().size() >= 3
 	}
 	
-	method tieneAfinidad(unCentro) { return self.puedeTrabajarEnCiudad( unCentro.ciudad() ) and
-		ciudadesConSucursales.any( { ciud => not unCentro.puedeCubrir(ciud) } )
+	method tieneAfinidad(unCentro) { return self.puedeTrabajarEnCiudad( unCentro.ciudad() )  and
+		 ciudadesConSucursales.any( { ciud =>  not unCentro.puedeCubrir(ciud) } )
 	}
 	
-		override method personaFisica() { return false
+	override method personaFisica() { return false
 			
 	}
 }

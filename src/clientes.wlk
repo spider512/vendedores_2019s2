@@ -4,9 +4,9 @@ import ciudades.*
 
 class  Clientes {
 	
-	var property inseguro
-	var property detallista
-	var property humanista
+	var property inseguro = false
+	var property detallista = false
+	var property humanista = false
 	
 	method puedeSerAtendidoPor(unVendedor) { return self.clienteInseguroLeVa(unVendedor)
 		or self.clienteDetallistaLeVa(unVendedor)
@@ -16,19 +16,19 @@ class  Clientes {
 	
 	method clienteInseguroLeVa(unVendedor) { return  if ( self.inseguro() )
 		unVendedor.esVersatil() and unVendedor.esFirme()
-		else {}
+		else { false }
 		
 	}
 	
 	method clienteDetallistaLeVa(unVendedor) { return if ( self.detallista() ) 
 		unVendedor.certificacionesSobreProductos() >= 3
-		else {}
+		else { false }
 		
 	}
 	
 	method clienteHumanistaLeVa(unVendedor) { return if ( self.humanista() ) 
 		unVendedor.personaFisica()
-		else {}
+		else { false }
 		
 	}
 }

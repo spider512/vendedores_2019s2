@@ -4,14 +4,14 @@ import clientes.*
 
 class CentroDeDistribucion {
 	
-	var property vendedores = {}
+	var property vendedores = []
 	var property ciudad
 	
 	method agregarVendedor(unVendedor) { if (vendedores.contains(unVendedor))  self.error("el vendedor ya es del equipo")
 		else vendedores.add(unVendedor)
 	}
 	
-	method vendedorEstrella() { return vendedores.max( {vend => vend.certificaciones().puntaje() }) 
+	method vendedorEstrella() { return vendedores.max( {vend => vend.puntajeTotal() }) 
 		
 	}
 	

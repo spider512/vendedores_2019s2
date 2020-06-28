@@ -2,6 +2,7 @@ import centrosDeDistribucion.*
 import vendedores.*
 import ciudades.*
 import clientes.*
+import vendedores.*
 
 test "testVendedores" {
 	
@@ -12,7 +13,7 @@ const cordoba = new Provincia()
 buenosAires.poblacion(6000000)
 
 const santaFe = new Provincia()	
-santaFe.poblacion( 5000000 )
+santaFe.poblacion(5000000)
 
 const rosario = new Ciudad()
 rosario.provincia(santaFe)
@@ -35,17 +36,63 @@ buenosAires.agregarCiudad(hurlingham)
 buenosAires.agregarCiudad(sanPedro)
 buenosAires.agregarCiudad(marDelPlata)
 
+const superCholo = new VComercioCorresponsal()
+superCholo.agregarCiudad(hurlingham)
+superCholo.agregarCiudad(marDelPlata)
+superCholo.agregarCiudad(sanPedro)
+
+const superCordobes = new VComercioCorresponsal()
+superCordobes.agregarCiudad(nono)
+
+
 
 const vViajante1 = new VViajante()
-
 vViajante1.agregarProvincia(cordoba)
 vViajante1.agregarProvincia(buenosAires)
 
 const vFijo1 = new Vfijo()
+const vFijo2 = new Vfijo()
+const vFijo3 = new Vfijo()
 
 vFijo1.ciudad(hurlingham)
+vFijo2.ciudad(hurlingham)
+vFijo3.ciudad(nono)
 
-	assert.equals(hurlingham, vFijo1.ciudad())
+const capacitacionVentas = new Certificaciones(puntos = 50)
+const certificadoHurlingham = new Certificaciones(puntos = 20)
+const capacitacionFordFocus = new Certificaciones(puntos = 10, esSobreProductos = true)
+const capacitacionFordKa = new Certificaciones(puntos = 10, esSobreProductos = true)
+const capacitacionFordMustang = new Certificaciones(puntos = 15, esSobreProductos = true)
+
+vFijo1.agregarCertificacion(capacitacionVentas)
+
+vFijo2.agregarCertificacion(capacitacionFordFocus)
+vFijo2.agregarCertificacion(capacitacionFordKa)
+
+vViajante1.agregarCertificacion(capacitacionVentas)
+vViajante1.agregarCertificacion(capacitacionFordFocus)
+vViajante1.agregarCertificacion(capacitacionFordKa)
+
+superCholo.agregarCertificacion(capacitacionVentas)
+superCholo.agregarCertificacion(capacitacionFordKa)
+
+const distribucionHurlingham = new CentroDeDistribucion()
+
+distribucionHurlingham.ciudad(hurlingham)
+distribucionHurlingham.agregarVendedor(vFijo1)
+distribucionHurlingham.agregarVendedor(vFijo2)
+
+const clienteHumanista = new Clientes()
+clienteHumanista.humanista(true)
+
+const clienteInseguro = new Clientes()
+clienteInseguro.inseguro(true)
+
+const clienteDetallista = new Clientes()
+clienteDetallista.detallista(true)
+
+
+assert.equals(hurlingham, vFijo1.ciudad())
 
 assert.that(vFijo1.puedeTrabajarEnCiudad(hurlingham) )
 assert.that( not vFijo1.puedeTrabajarEnCiudad(nono) )
@@ -53,5 +100,88 @@ assert.that( not vFijo1.puedeTrabajarEnCiudad(nono) )
 assert.that(vViajante1.puedeTrabajarEnCiudad(hurlingham) )
 assert.that(vViajante1.puedeTrabajarEnCiudad(nono) )
 assert.that(not vViajante1.puedeTrabajarEnCiudad(rosario) )
+
+assert.that(superCholo.puedeTrabajarEnCiudad(hurlingham) )
+assert.that(superCholo.puedeTrabajarEnCiudad(marDelPlata) )
+assert.that( not superCholo.puedeTrabajarEnCiudad(nono) )
+
+assert.that(not vFijo1.esVersatil() )
+assert.that(vViajante1.esVersatil() )
+assert.that(not superCholo.esVersatil() )
+
+assert.that( vFijo1.esFirme() )
+assert.that( vViajante1.esFirme() )
+assert.that( superCholo.esFirme() )
+assert.that( not vFijo2.esFirme() )
+
+assert.that( not vFijo1.esInfluyente() )
+assert.that( vViajante1.esInfluyente() )
+assert.that( not superCholo.esInfluyente() )
+
+superCholo.agregarCiudad(nono)
+superCholo.agregarCiudad(rosario)
+
+assert.that( superCholo.esInfluyente() )
+
+//   CERTIFICACIONES
+
+/// Aquio se pruea el error que devuelve si el vendedor ya esta entre los vendedores
+// para probarlo: Retire las " // " que estan delante de las lineas 112 y 113.
+//assert.equals("wollok.lang.DomainException: el vendedor ya es del equipo
+//   at centrosDeDistribucion.CentroDeDistribucion.agregarVendedor(unVendedor)" ,distribucionHurlingham.agregarVendedor(vFijo1) )
+
+assert.that( distribucionHurlingham.puedeCubrir(hurlingham) )
+assert.that( not distribucionHurlingham.puedeCubrir(nono) )
+
+distribucionHurlingham.agregarVendedor(vViajante1)
+
+assert.equals(vViajante1, distribucionHurlingham.vendedorEstrella())
+
+assert.that( distribucionHurlingham.puedeCubrir(nono) )
+
+assert.equals([vFijo1,vViajante1] ,distribucionHurlingham.vendedoresGenericos() )
+
+assert.that( not distribucionHurlingham.esRobusto() )
+
+distribucionHurlingham.agregarVendedor(superCholo)
+
+assert.that( distribucionHurlingham.esRobusto() )
+
+// REPARTO DE CERTIFICACIONES
+ 
+assert.equals([capacitacionFordFocus,capacitacionFordKa] ,vFijo2.certificaciones() )
+assert.equals([capacitacionVentas] ,vFijo1.certificaciones() )
+assert.equals([capacitacionVentas,capacitacionFordFocus,capacitacionFordKa] ,vViajante1.certificaciones() )
+ 
+distribucionHurlingham.repartirCertificacion(certificadoHurlingham)
+
+assert.equals([capacitacionFordFocus,capacitacionFordKa,certificadoHurlingham] ,vFijo2.certificaciones() )
+assert.equals([capacitacionVentas,certificadoHurlingham] ,vFijo1.certificaciones() )
+assert.equals([capacitacionVentas,capacitacionFordFocus,capacitacionFordKa,certificadoHurlingham] ,vViajante1.certificaciones() )
+
+// AFINIDAD
+
+assert.that( vFijo1.tieneAfinidad(distribucionHurlingham )  )
+assert.that( not vFijo3.tieneAfinidad(distribucionHurlingham )  )
+ // Para probar la linea 157 se debe comentar la linea 135 y la 137 dado que el centro de distribucion contiene asuperCholo como 
+ // vendedor y no se cumple la segunda condicion de afinidad de cholo para con el centro
+// assert.that( superCholo.tieneAfinidad(distribucionHurlingham) )
+assert.that( not superCholo.tieneAfinidad(distribucionHurlingham )  ) 
+assert.that( not superCordobes.tieneAfinidad(distribucionHurlingham )  )
+
+assert.that( not distribucionHurlingham.esCandidato(vFijo1)  )
+assert.that(  distribucionHurlingham.esCandidato(vViajante1)  )
+
+//     CLIENTES
+
+assert.that( clienteHumanista.puedeSerAtendidoPor(vViajante1) )
+assert.that(not clienteHumanista.puedeSerAtendidoPor(superCholo) )
+
+vFijo2.agregarCertificacion(capacitacionFordMustang)
+assert.that( clienteDetallista.puedeSerAtendidoPor(vFijo2) )
+assert.that(not clienteDetallista.puedeSerAtendidoPor(superCholo) )
+
+assert.that( clienteInseguro.puedeSerAtendidoPor(vViajante1) )
+assert.that(not clienteInseguro.puedeSerAtendidoPor(vFijo1) )
 
 }
